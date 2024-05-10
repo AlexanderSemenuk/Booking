@@ -1,10 +1,11 @@
-﻿using Booking.Model;
+﻿using Booking.Models.Entities;
+using Booking.Models.InputModels;
 
 namespace Booking.Services
 {
     public interface IUserService 
     {
-        //Task<User> CreateUser(string firstName, string lastName, string email, string password);
+        Task<string> CreateUser(UserInputModel userInput);
 
         //Task<UserDto> LogIn(string email, string password);
     }

@@ -1,4 +1,4 @@
-﻿namespace Booking.Model
+﻿namespace Booking.Models.DTO
 {
     public class UserDto
     {

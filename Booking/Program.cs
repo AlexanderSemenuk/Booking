@@ -16,7 +16,6 @@ namespace Booking
             builder.Services
                     .AddEndpointsApiExplorer()
                     .AddSwaggerGen()
-                    .AddDbContext<AppDbContext>()
                     .AddScoped<IUserService, UserService>()
                     .AddScoped<IBookingService, BookingService>();
 

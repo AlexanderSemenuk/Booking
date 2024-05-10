@@ -1,4 +1,4 @@
-﻿namespace Booking.Model
+﻿namespace Booking.Models.Entities
 {
     public class Housing
     {
@@ -6,9 +6,9 @@
         public string name { get; set; }
         public string location { get; set; }
         public string description { get; set; }
-        public double pricePerNight { get; set; }
+        public double pricePerMonth { get; set; }
         public bool? isAvailable { get; set; }
-        public DateTime? bookingStartDate { get; set; }
-        public DateTime? bookingEndDate { get; set; }
+        public DateOnly? bookingStartDate { get; set; }
+        public DateOnly? bookingEndDate { get; set; }
     }
 }

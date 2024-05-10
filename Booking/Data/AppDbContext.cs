@@ -1,4 +1,4 @@
-﻿using Booking.Model;
+﻿using Booking.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Data
@@ -8,7 +8,7 @@ namespace Booking.Data
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-         
+            Database.EnsureCreated();
         }
 
         public DbSet<Housing> Housing { get; set; }

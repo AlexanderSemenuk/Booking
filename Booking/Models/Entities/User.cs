@@ -1,4 +1,4 @@
-﻿namespace Booking.Model
+﻿namespace Booking.Models.Entities
 {
     public class User
     {

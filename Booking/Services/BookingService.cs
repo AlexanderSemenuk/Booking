@@ -1,5 +1,7 @@
 ﻿using Booking.Data;
-using Booking.Model;
+using Booking.Models.Entities;
+using Booking.Models.InputModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Services
 {
@@ -12,39 +14,77 @@ namespace Booking.Services
             _appDbContext = appDbContext;
         }
 
-        public async Task<string> AddHousing(Housing housing)
+        public async Task<List<Housing>> GetHousingData()
         {
-            if (housing == null)
+            List<Housing> housings =  await _appDbContext.Housing
+                .OrderBy(n => n.name)
+                .ToListAsync();
+
+
+            return housings;
+        }
+
+        public async Task<List<Housing>> GetHousing(string name)
+        {
+            IQueryable<Housing> query = _appDbContext.Housing
+                .Where(n => n.name.Contains(name))
+                .OrderBy(p => p.pricePerMonth);
+
+            List<Housing> matchingHousings = await query.ToListAsync();
+
+            return matchingHousings;
+
+
+        }
+        public async Task<List<Housing>> GetAvailableHousing()
+        {
+            IQueryable<Housing> query = _appDbContext.Housing
+                .Where(h => h.isAvailable == true)
+                .OrderBy(n => n.name);
+
+            List<Housing> availableHousings = await query.ToListAsync();
+
+            return availableHousings;
+        }
+        public async Task<string> AddHousing(HousingInputModel inputModel)
+        {
+            if (inputModel == null)
             {
-                return "Housing object cannot be null.";
+                return "Input model cannot be null.";
             }
 
-            if (string.IsNullOrWhiteSpace(housing.name))
+            if (string.IsNullOrWhiteSpace(inputModel.name))
             {
                 return "Housing name cannot be null or empty.";
             }
 
-            if (string.IsNullOrWhiteSpace(housing.location))
+            if (string.IsNullOrWhiteSpace(inputModel.location))
             {
                 return "Housing location cannot be null or empty.";
             }
 
-            if (string.IsNullOrWhiteSpace(housing.description))
+            if (string.IsNullOrWhiteSpace(inputModel.description))
             {
                 return "Housing description cannot be null or empty.";
             }
 
-            if (housing.pricePerNight <= 0)
+            if (inputModel.pricePerMonth <= 0)
             {
-                return "Housing price per night must be greater than zero.";
+                return "Housing price per month must be greater than zero.";
             }
 
             try
             {
-                // Set the booking-related fields to null for new housing
-                housing.isAvailable = null;
-                housing.bookingStartDate = null;
-                housing.bookingEndDate = null;
+                Housing housing = new Housing
+                {
+                    name = inputModel.name,
+                    location = inputModel.location,
+                    description = inputModel.description,
+                    pricePerMonth = inputModel.pricePerMonth,
+                    isAvailable = true, 
+                    bookingStartDate = null, 
+                    bookingEndDate = null, 
+                };
 
                 await _appDbContext.Housing.AddAsync(housing);
                 _appDbContext.SaveChanges();
@@ -55,5 +95,6 @@ namespace Booking.Services
                 return $"Error adding housing: {ex.Message}";
             }
         }
+
     }
 }
