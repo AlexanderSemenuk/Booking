@@ -1,5 +1,6 @@
 
 using Booking.Data;
+using Booking.Security;
 using Booking.Services;
 using Microsoft.EntityFrameworkCore;
 namespace Booking
@@ -16,6 +17,7 @@ namespace Booking
             builder.Services
                     .AddEndpointsApiExplorer()
                     .AddSwaggerGen()
+                    .AddScoped<PasswordHasher>()
                     .AddScoped<IUserService, UserService>()
                     .AddScoped<IBookingService, BookingService>();
 

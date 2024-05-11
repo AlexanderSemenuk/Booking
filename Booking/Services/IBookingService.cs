@@ -7,12 +7,15 @@ namespace Booking.Services
     {
         Task<List<Housing>> GetHousingData();
 
-        Task<List<Housing>> GetHousing(string name);
+        Task<Housing> GetHousing(string name);
+
 
         Task<List<Housing>> GetAvailableHousing();
 
-        //Task<string> BookHousing(string name, string userEmail);
+        Task<bool> BookHousing(string housingName, string userEmail, DateOnly startDate, DateOnly endDate);
 
         Task<string> AddHousing(HousingInputModel housing);
+
+        Task<string> ChangeStatus(Housing housing);
     }
 }

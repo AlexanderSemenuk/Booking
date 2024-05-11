@@ -24,17 +24,17 @@ namespace Booking.Services
             return housings;
         }
 
-        public async Task<List<Housing>> GetHousing(string name)
+        public async Task<Housing> GetHousing(string name)
         {
-            IQueryable<Housing> query = _appDbContext.Housing
-                .Where(n => n.name.Contains(name))
-                .OrderBy(p => p.pricePerMonth);
+            Housing mathingHousing = await _appDbContext.Housing.FirstOrDefaultAsync(h => h.name == name);
 
-            List<Housing> matchingHousings = await query.ToListAsync();
+            return mathingHousing;
+        }
 
-            return matchingHousings;
+        public async Task<string> ChangeStatus(Housing housing)
+        {
 
-
+            return "123";
         }
         public async Task<List<Housing>> GetAvailableHousing()
         {
@@ -45,6 +45,36 @@ namespace Booking.Services
             List<Housing> availableHousings = await query.ToListAsync();
 
             return availableHousings;
+        }
+
+        public async Task<bool> BookHousing(string housingName, string userEmail, DateOnly startDate, DateOnly endDate)
+        {
+            Housing housingToBook = await _appDbContext.Housing.FirstOrDefaultAsync(h => h.name == housingName);
+
+            housingToBook.isAvailable = false;
+
+            User userBooking = await _appDbContext.Users.FirstOrDefaultAsync(u => u.email == userEmail);
+
+            if (housingToBook != null && userBooking != null)
+            {
+                // Mark the housing as not available
+                housingToBook.isAvailable = false;
+                housingToBook.bookingStartDate = startDate;
+                housingToBook.bookingEndDate = endDate;
+                _appDbContext.Entry(housingToBook).State = EntityState.Modified;
+
+                // Add the housing to the user's reserved accommodations
+                userBooking.ReservedAccommodations.Add(housingToBook);
+
+                // Save the changes to the database
+                await _appDbContext.SaveChangesAsync();
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         public async Task<string> AddHousing(HousingInputModel inputModel)
         {
@@ -87,7 +117,7 @@ namespace Booking.Services
                 };
 
                 await _appDbContext.Housing.AddAsync(housing);
-                _appDbContext.SaveChanges();
+                _appDbContext.SaveChangesAsync();
                 return $"Housing '{housing.name}' was successfully added.";
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
-﻿using Booking.Models.Entities;
+﻿using Booking.Models.DTO;
+using Booking.Models.Entities;
 using Booking.Models.InputModels;
 
 namespace Booking.Services
@@ -7,6 +8,9 @@ namespace Booking.Services
     {
         Task<string> CreateUser(UserInputModel userInput);
 
-        //Task<UserDto> LogIn(string email, string password);
+        Task<UserDto> LogIn(string email, string password);
+
+        Task<UserDto> GetUser(string email);
+
     }
 }
