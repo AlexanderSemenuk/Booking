@@ -19,6 +19,18 @@ namespace Booking.Services
         }
         public async Task<string> CreateUser(UserInputModel userInput)
         {
+            if (string.IsNullOrEmpty(userInput.firstName) || string.IsNullOrEmpty(userInput.lastName) || string.IsNullOrEmpty(userInput.email) || string.IsNullOrEmpty(userInput.login) || string.IsNullOrEmpty(userInput.password))
+            {
+                return "Error: All fields must be provided and cannot be null or empty.";
+            }
+
+            User existingUser = await _appDbContext.Users.FirstOrDefaultAsync(u => u.login == userInput.login || u.email == userInput.email);
+
+            if (existingUser != null)
+            {
+                return "Error: A user with this login or email already exists.";
+            }
+
             var (hashedPassword, salt) = _passwordHasher.HashPassword(userInput.password);
 
             User newUser = new User
@@ -36,11 +48,21 @@ namespace Booking.Services
             return $"User '{newUser.login}' was successfully added.";
         }
 
-        public async Task<UserDto> LogIn(string login, string password)
+        public async Task<string> LogIn(string login, string password)
         {
+            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
+            {
+                return "Error: Login and password must be provided.";
+            }
+
             User user = await _appDbContext.Users
                 .Include(u => u.ReservedAccommodations) // Include ReservedAccommodations in the query
                 .FirstOrDefaultAsync(u => u.login == login);
+
+            if (user == null)
+            {
+                return "Error: User not found.";
+            }
 
             bool passwordCheck = _passwordHasher.VerifyPassword(password, user.password, user.salt);
 
@@ -54,34 +76,39 @@ namespace Booking.Services
                     ReservedAccommodations = user.ReservedAccommodations
                 };
 
-                return userDto;
+                return $"Login successful for user '{userDto.firstName} {userDto.lastName}'.";
             }
             else
             {
-                return null;
+                return "Error: Invalid password.";
             }
         }
 
-        public async Task<UserDto> GetUser(string email)
+        public async Task<string> ChangePassword(string login, string oldPassword, string newPassword)
         {
-            User user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.email == email);
+            User user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.login == login);
 
-            if (user != null)
+            bool passwordCheck = _passwordHasher.VerifyPassword(oldPassword, user.password, user.salt);
+
+            if (passwordCheck)
             {
-                UserDto userDto = new UserDto
-                {
-                    email = user.email,
-                    firstName = user.firstName,
-                    lastName = user.lastName,
-                    ReservedAccommodations = user.ReservedAccommodations
-                };
+                var (newHashedPassword, newSalt) = _passwordHasher.HashPassword(newPassword);
 
-                return userDto;
+                user.password = newHashedPassword;
+                user.salt = newSalt;
+
+                _appDbContext.Entry(user).State = EntityState.Modified;
+
+                await _appDbContext.SaveChangesAsync();
+
+                return "Password changed";
             }
             else
             {
-                return null;
+                return "Enter valid old password";
             }
         }
+
+        
     }
 }

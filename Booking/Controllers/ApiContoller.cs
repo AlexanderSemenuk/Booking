@@ -37,6 +37,7 @@ namespace Booking.Controllers
         {
             List<Housing> result = await _bookingService.GetHousingData();
 
+
             return Ok(result);
         }
 
@@ -62,11 +63,29 @@ namespace Booking.Controllers
             return Ok(result);
         }
 
+        [HttpGet("getHousingByName")]
+
+        public async Task<ActionResult<Housing>> GetHousingByName(string name)
+        {
+            var housing = await _bookingService.GetHousing(name);
+
+            return housing;
+        }
+
+        [HttpPatch("removeBooking")]
+
+        public async Task<IActionResult> RemoveBooking(string name)
+        {
+            string result = await _bookingService.RemoveBooking(name);
+
+            return Ok(result);
+        }
+
         [HttpPost("logIn")]
 
-        public async Task<IActionResult> LogIn(string email, string password)
+        public async Task<IActionResult> LogIn(string logIn, string password)
         {
-            UserDto user = await _userService.LogIn(email, password);
+            string user = await _userService.LogIn(logIn, password);
 
             if (user != null)
             {
@@ -80,7 +99,7 @@ namespace Booking.Controllers
 
         [HttpPost("bookHousing")]
 
-        public async Task<IActionResult> BookHousing(string housingName, string userEmail, DateOnly startDate, DateOnly endDate)
+        public async Task<IActionResult> BookHousing(string housingName, string userEmail, string startDate, string endDate)
         {
             bool bookingCheck = await _bookingService.BookHousing(housingName, userEmail, startDate, endDate);
 
@@ -91,5 +110,14 @@ namespace Booking.Controllers
             else
                 return BadRequest("Booking error");
         }
+
+        [HttpPatch("changePassword")]
+            public async Task<IActionResult> ChangePassword(string login, string oldPassword, string newPassword)
+            {
+                string result = await _userService.ChangePassword(login, oldPassword, newPassword);
+
+                return Ok(result);
+            }
+        
     }
 }

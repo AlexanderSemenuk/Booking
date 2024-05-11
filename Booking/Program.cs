@@ -1,4 +1,5 @@
 
+using System.ComponentModel;
 using Booking.Data;
 using Booking.Security;
 using Booking.Services;
@@ -15,11 +16,12 @@ namespace Booking
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services
-                    .AddEndpointsApiExplorer()
-                    .AddSwaggerGen()
-                    .AddScoped<PasswordHasher>()
-                    .AddScoped<IUserService, UserService>()
-                    .AddScoped<IBookingService, BookingService>();
+                .AddEndpointsApiExplorer()
+                .AddSwaggerGen()
+                .AddScoped<PasswordHasher>()
+                .AddScoped<IUserService, UserService>()
+                .AddScoped<IBookingService, BookingService>();
+
 
 
             builder.Services.AddDbContext<AppDbContext>(options =>

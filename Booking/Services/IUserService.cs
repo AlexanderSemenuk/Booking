@@ -8,9 +8,9 @@ namespace Booking.Services
     {
         Task<string> CreateUser(UserInputModel userInput);
 
-        Task<UserDto> LogIn(string email, string password);
+        Task<string> LogIn(string logIn, string password);
 
-        Task<UserDto> GetUser(string email);
 
+        Task<string> ChangePassword(string login, string oldPassword, string newPassword);
     }
 }
